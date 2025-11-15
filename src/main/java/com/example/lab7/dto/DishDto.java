@@ -12,7 +12,6 @@ public class DishDto {
     private String name;
     private String description;
     private Double price;
-    private String category;
     private Boolean isAvailable;
-    private String imageUrl;
+    private String imageUrl; //уберу потом нврн
 }

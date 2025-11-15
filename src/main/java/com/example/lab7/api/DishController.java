@@ -11,8 +11,9 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/dish")
+@RequestMapping("/dishes")
 public class DishController {
+
     private final DishService dishService;
 
     @GetMapping
@@ -30,6 +31,7 @@ public class DishController {
                 ? new ResponseEntity<>(HttpStatus.NOT_FOUND)
                 : ResponseEntity.ok(dish);
     }
+
 
     @PostMapping
     public ResponseEntity<DishDto> addDish(@RequestBody DishDto dto) {

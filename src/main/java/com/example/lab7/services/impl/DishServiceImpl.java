@@ -1,14 +1,13 @@
 package com.example.lab7.services.impl;
 
-
 import com.example.lab7.dto.DishDto;
+import com.example.lab7.mapper.DishMapper;
 import com.example.lab7.models.Dish;
 import com.example.lab7.repositories.DishRepository;
 import com.example.lab7.services.DishService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -16,27 +15,26 @@ import java.util.List;
 public class DishServiceImpl implements DishService {
 
     private final DishRepository dishRepository;
+    private final DishMapper dishMapper;
 
     @Override
     public List<DishDto> getAllDishes() {
         List<Dish> dishes = dishRepository.findAll();
-        List<DishDto> dtoList = new ArrayList<>();
-        dishes.forEach(dish -> dtoList.add(toDto(dish)));
-        return dtoList;
-    }
-
-    @Override
-    public DishDto addDish(DishDto dto) {
-        Dish dish = toEntity(dto);
-        Dish saved = dishRepository.save(dish);
-        return toDto(saved);
+        return dishMapper.toDtoList(dishes);
     }
 
     @Override
     public DishDto getDish(Long id) {
         return dishRepository.findById(id)
-                .map(this::toDto)
+                .map(dishMapper::toDto)
                 .orElse(null);
+    }
+
+    @Override
+    public DishDto addDish(DishDto dto) {
+        Dish dish = dishMapper.toEntity(dto);
+        Dish saved = dishRepository.save(dish);
+        return dishMapper.toDto(saved);
     }
 
     @Override
@@ -44,10 +42,10 @@ public class DishServiceImpl implements DishService {
         if (!dishRepository.existsById(id)) {
             return null;
         }
-        Dish dish = toEntity(dto);
+        Dish dish = dishMapper.toEntity(dto);
         dish.setId(id);
         Dish updated = dishRepository.save(dish);
-        return toDto(updated);
+        return dishMapper.toDto(updated);
     }
 
     @Override
@@ -59,27 +57,11 @@ public class DishServiceImpl implements DishService {
         return false;
     }
 
-    private DishDto toDto(Dish dish) {
-        return DishDto.builder()
-                .id(dish.getId())
-                .name(dish.getName())
-                .description(dish.getDescription())
-                .price(dish.getPrice())
-                .category(dish.getCategory())
-                .isAvailable(dish.getIsAvailable())
-                .imageUrl(dish.getImageUrl())
-                .build();
+    public List<Dish> getDishesByIds(List<Long> ids) {
+        return dishRepository.findByIdIn(ids);
     }
 
-    private Dish toEntity(DishDto dto) {
-        Dish dish = new Dish();
-        dish.setId(dto.getId());
-        dish.setName(dto.getName());
-        dish.setDescription(dto.getDescription());
-        dish.setPrice(dto.getPrice());
-        dish.setCategory(dto.getCategory());
-        dish.setIsAvailable(dto.getIsAvailable());
-        dish.setImageUrl(dto.getImageUrl());
-        return dish;
+    public boolean existsById(Long id) {
+        return dishRepository.existsById(id);
     }
 }
